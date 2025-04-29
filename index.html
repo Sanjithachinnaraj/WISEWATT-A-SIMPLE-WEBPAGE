@@ -1,15 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WiseWatt</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WiseWatt - Home</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+    }
+    .container {
+      padding: 60px 20px;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.5em;
+    }
+    p {
+      font-size: 1.2em;
+    }
+    .nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .battery-bar {
+      width: 60%;
+      height: 40px;
+      margin: 20px auto;
+      background: #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .battery-fill {
+      height: 100%;
+      width: 0%;
+      background: limegreen;
+      text-align: right;
+      padding-right: 10px;
+      line-height: 40px;
+      color: black;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>WiseWatt: Battery Charge Monitor</h1>
-  <p id="status">Checking battery status...</p>
-  <p id="time">Estimating time remaining...</p>
+  <div class="nav">
+    <a href="#home">Home</a>
+    <a href="#level">Charge Level</a>
+    <a href="#time">Time Remaining</a>
+  </div>  <div class="container" id="home">
+    <h1>Welcome to WiseWatt</h1>
+    <p>This website helps you monitor your device's battery charge level and charging time.</p>
+  </div>  <div class="container" id="level">
+    <h1>Battery Charge Level</h1>
+    <div class="battery-bar">
+      <div class="battery-fill" id="batteryFill">0%</div>
+    </div>
+    <p id="chargingStatus">Checking battery status...</p>
+  </div>  <div class="container" id="time">
+    <h1>Time Until Full Charge</h1>
+    <p id="chargeTime">Estimating time...</p>
+  </div>  <script>
+    navigator.getBattery().then(battery => {
+      function updateBatteryInfo() {
+        const level = Math.round(battery.level * 100);
+        const fill = document.getElementById("batteryFill");
+        fill.style.width = level + "%";
+        fill.textContent = level + "%";
 
-  <script src="script.js"></script>
-</body>
+        const statusText = battery.charging
+          ? "Charging"
+          : "Discharging";
+        document.getElementById("chargingStatus").textContent =
+          Battery is currently: ${statusText};
+
+        const time = battery.charging ? battery.chargingTime : battery.dischargingTime;
+        const mins = time === Infinity ? "Calculating..." : Math.round(time / 60) + " minutes";
+        const label = battery.charging ? "Time to full charge" : "Time remaining";
+
+        document.getElementById("chargeTime").textContent = ${label}: ${mins};
+
+        if (level === 100 && battery.charging) {
+          alert("Battery is fully charged!");
+        }
+      }
+
+      updateBatteryInfo();
+      battery.addEventListener("chargingchange", updateBatteryInfo);
+      battery.addEventListener("levelchange", updateBatteryInfo);
+      battery.addEventListener("chargingtimechange", updateBatteryInfo);
+      battery.addEventListener("dischargingtimechange", updateBatteryInfo);
+    });
+  </script></body>
 </html>
